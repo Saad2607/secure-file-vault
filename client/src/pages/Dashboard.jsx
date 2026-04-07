@@ -227,7 +227,7 @@ function Dashboard() {
                                                 {/* 🖼 IMAGE */}
                                                 {isImage(f.originalname) && (
                                                     <img
-                                                        src={`http://localhost:5000/api/files/file/${f._id}`}
+                                                        src={`https://secure-file-vault-btqm.onrender.com/api/files/file/${f._id}`}
                                                         alt="preview"
                                                         className="w-full h-full object-cover"
                                                         onError={(e) => {
@@ -354,7 +354,7 @@ function Dashboard() {
                         {/* 🖼 IMAGE */}
                         {isImage(selectedFile.originalname) && (
                             <img
-                                src={`http://localhost:5000/api/files/file/${selectedFile._id}`}
+                                src={`https://secure-file-vault-btqm.onrender.com/api/files/file/${selectedFile._id}`}
                                 className="max-h-full max-w-full object-contain rounded-lg"
                                 alt="preview"
                             />
@@ -363,7 +363,7 @@ function Dashboard() {
                         {/* 📄 PDF */}
                         {isPDF(selectedFile.originalname) && (
                             <iframe
-                                src={`http://localhost:5000/api/files/file/${selectedFile._id}`}
+                                src={`https://secure-file-vault-btqm.onrender.com/api/files/file/${selectedFile._id}`}
                                 className="w-full h-full rounded-lg"
                                 title="pdf-preview"
                             />
