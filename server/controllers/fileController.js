@@ -8,16 +8,16 @@ exports.uploadFile = async (req, res) => {
         const file = req.file;
 
         // ✅ Read file
-        const fileData = fs.readFileSync(file.path);
+        // const fileData = fs.readFileSync(file.path);
 
-        // ✅ Encrypt
-        const encryptedData = CryptoJS.AES.encrypt(
-            fileData.toString("base64"),
-            process.env.JWT_SECRET
-        ).toString();
+        // // ✅ Encrypt
+        // const encryptedData = CryptoJS.AES.encrypt(
+        //     fileData.toString("base64"),
+        //     process.env.JWT_SECRET
+        // ).toString();
 
-        // ✅ Save encrypted data
-        fs.writeFileSync(file.path, encryptedData);
+        // // ✅ Save encrypted data
+        // fs.writeFileSync(file.path, encryptedData);
 
         file.path = `uploads/${file.filename}`;
 
