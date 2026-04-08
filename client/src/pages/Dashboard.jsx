@@ -10,6 +10,7 @@ function Dashboard() {
     const [activeTab, setActiveTab] = useState("files");
     const [selectedFile, setSelectedFile] = useState(null);
     const [search, setSearch] = useState("");
+    const [openMenuId, setOpenMenuId] = useState(null);
 
     const filteredFiles = files.filter((file) => {
         const matchesSearch = file.originalname
@@ -138,6 +139,12 @@ function Dashboard() {
         }
     }, [file]);
 
+    useEffect(() => {
+        const handleClickOutside = () => setOpenMenuId(null);
+        window.addEventListener("click", handleClickOutside);
+        return () => window.removeEventListener("click", handleClickOutside);
+    }, []);
+
     return (
         <div className="min-h-screen bg-gray-950 text-white">
             <Toaster />
@@ -261,66 +268,98 @@ function Dashboard() {
                                             </p>
 
                                             {/* Buttons */}
-                                            <div className="flex justify-center items-center gap-2 flex-nowrap">
+                                            <div className="relative flex justify-end">
 
-                                                {/* ⭐ Favorite */}
-                                                {activeTab !== "trash" && (
-                                                    <button
-                                                        onClick={() => toggleFavorite(f._id)}
-                                                        className={`px-2 py-1 rounded ${f.isFavorite
-                                                            ? "bg-yellow-500 text-black"
-                                                            : "bg-gray-700 text-white"
-                                                            }`}
-                                                    >
-                                                        {f.isFavorite ? "⭐" : "☆"}
-                                                    </button>
-                                                )}
-
-                                                {/* ⬇ Download */}
+                                                {/* 3 DOT BUTTON */}
                                                 <button
-                                                    onClick={() => handleDownload(f.fileUrl, f.originalname)}
-                                                    className="bg-blue-500 px-3 py-1 rounded text-sm hover:bg-blue-600"
+                                                    onClick={() =>
+                                                        setOpenMenuId(openMenuId === f._id ? null : f._id)
+                                                    }
+                                                    className="text-white text-xl"
                                                 >
-                                                    Download
+                                                    ⋮
                                                 </button>
 
-                                                {/* 🗑 Delete */}
-                                                {activeTab !== "trash" && (
-                                                    <button
-                                                        onClick={() => deleteFile(f._id)}
-                                                        className="bg-red-500 px-3 py-1 rounded text-sm hover:bg-red-600"
-                                                    >
-                                                        Delete
-                                                    </button>
+                                                {/* DROPDOWN MENU */}
+                                                {openMenuId === f._id && (
+                                                    <div className="absolute right-0 top-8 bg-gray-800 rounded-lg shadow-lg w-40 z-50">
+
+                                                        {/* ⭐ Favorite */}
+                                                        {activeTab !== "trash" && (
+                                                            <button
+                                                                onClick={() => {
+                                                                    toggleFavorite(f._id);
+                                                                    setOpenMenuId(null);
+                                                                }}
+                                                                className="block w-full text-left px-4 py-2 hover:bg-gray-700"
+                                                            >
+                                                                {f.isFavorite ? "⭐ Unfavorite" : "⭐ Favorite"}
+                                                            </button>
+                                                        )}
+
+                                                        {/* ⬇ Download */}
+                                                        <button
+                                                            onClick={() => {
+                                                                handleDownload(f.fileUrl, f.originalname);
+                                                                setOpenMenuId(null);
+                                                            }}
+                                                            className="block w-full text-left px-4 py-2 hover:bg-gray-700"
+                                                        >
+                                                            ⬇ Download
+                                                        </button>
+
+                                                        {/* 🔗 Share */}
+                                                        <button
+                                                            onClick={() => {
+                                                                handleShare(f._id);
+                                                                setOpenMenuId(null);
+                                                            }}
+                                                            className="block w-full text-left px-4 py-2 hover:bg-gray-700"
+                                                        >
+                                                            🔗 Share
+                                                        </button>
+
+                                                        {/* 🗑 Delete */}
+                                                        {activeTab !== "trash" && (
+                                                            <button
+                                                                onClick={() => {
+                                                                    deleteFile(f._id);
+                                                                    setOpenMenuId(null);
+                                                                }}
+                                                                className="block w-full text-left px-4 py-2 hover:bg-gray-700 text-red-400"
+                                                            >
+                                                                🗑 Delete
+                                                            </button>
+                                                        )}
+
+                                                        {/* ♻ Restore */}
+                                                        {activeTab === "trash" && (
+                                                            <button
+                                                                onClick={() => {
+                                                                    restoreFile(f._id);
+                                                                    setOpenMenuId(null);
+                                                                }}
+                                                                className="block w-full text-left px-4 py-2 hover:bg-gray-700 text-green-400"
+                                                            >
+                                                                ♻ Restore
+                                                            </button>
+                                                        )}
+
+                                                        {/* 💀 Permanent Delete */}
+                                                        {activeTab === "trash" && (
+                                                            <button
+                                                                onClick={() => {
+                                                                    deletePermanent(f._id);
+                                                                    setOpenMenuId(null);
+                                                                }}
+                                                                className="block w-full text-left px-4 py-2 hover:bg-gray-700 text-red-500"
+                                                            >
+                                                                💀 Delete Forever
+                                                            </button>
+                                                        )}
+
+                                                    </div>
                                                 )}
-
-                                                <button
-                                                    onClick={() => handleShare(f._id)}
-                                                    className="bg-blue-500 px-3 py-1 rounded text-sm hover:bg-blue-600"
-                                                >
-                                                    Share
-                                                </button>
-
-                                                {/* ♻ Restore */}
-                                                {activeTab === "trash" && (
-                                                    <button
-                                                        onClick={() => restoreFile(f._id)}
-                                                        className="bg-green-500 px-3 py-1 rounded text-sm"
-                                                    >
-                                                        Restore
-                                                    </button>
-                                                )}
-
-                                                {/* 💀 Permanent Delete */}
-                                                {activeTab === "trash" && (
-                                                    <button
-                                                        onClick={() => deletePermanent(f._id)}
-                                                        className="bg-red-500 px-3 py-1 rounded text-sm"
-                                                    >
-                                                        Delete Forever
-                                                    </button>
-                                                )}
-
                                             </div>
                                         </div>
                                     ))}
@@ -358,7 +397,7 @@ function Dashboard() {
                         {/* 📄 PDF */}
                         {isPDF(selectedFile.originalname) && (
                             <iframe
-                                src={selectedFile.fileUrl}
+                                src={`https://docs.google.com/gview?url=${selectedFile.fileUrl}&embedded=true`}
                                 className="w-full h-full rounded-lg"
                                 title="pdf-preview"
                             />

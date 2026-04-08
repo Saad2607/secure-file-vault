@@ -4,9 +4,12 @@ const cloudinary = require("../config/cloudinary");
 
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
-    params: {
-        folder: "secure-file-vault",
-        resource_type: "auto", // 🔥 supports image, pdf, doc
+    params: async (req, file) => {
+        return {
+            folder: "secure-file-vault",
+            resource_type: "auto", // keep this
+            public_id: Date.now() + "-" + file.originalname,
+        };
     },
 });
 
