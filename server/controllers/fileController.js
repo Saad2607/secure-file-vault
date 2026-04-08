@@ -172,36 +172,24 @@ exports.getFile = async (req, res) => {
     try {
         const file = await File.findById(req.params.id);
 
-        if (!file) return res.status(404).json({ message: "File not found" });
-
-        const encryptedData = fs.readFileSync(file.path, "utf8");
-
-        // ✅ Decrypt
-        const bytes = CryptoJS.AES.decrypt(
-            encryptedData,
-            process.env.JWT_SECRET
-        );
-
-        const decryptedData = Buffer.from(
-            bytes.toString(CryptoJS.enc.Utf8),
-            "base64"
-        );
-
-        const ext = path.extname(file.originalname).toLowerCase();
-
-        if (ext === ".png") {
-            res.setHeader("Content-Type", "image/png");
-        } else if (ext === ".jpg" || ext === ".jpeg") {
-            res.setHeader("Content-Type", "image/jpeg");
-        } else if (ext === ".pdf") {
-            res.setHeader("Content-Type", "application/pdf");
+        if (!file) {
+            return res.status(404).json({ message: "File not found" });
         }
 
-        // ✅ Send correct type
-        res.setHeader("Content-Disposition", `inline; filename="${file.originalname}"`);
-        res.send(decryptedData);
+        console.log("DB FILE:", file); // 🔍
+        
+        const filePath = path.join(process.cwd(), file.path);
 
-    } catch (error) {
+        console.log("FINAL PATH:", filePath); // 🔍
+
+        if (!fs.existsSync(filePath)) {
+            console.log("FILE NOT FOUND ON SERVER ❌");
+            return res.status(404).json({ message: "File not found on server" });
+        }
+
+        res.sendFile(filePath);
+    } catch (err) {
+        console.log("GET FILE ERROR:", err); // 🔥
         res.status(500).json({ message: "Error retrieving file" });
     }
 };
