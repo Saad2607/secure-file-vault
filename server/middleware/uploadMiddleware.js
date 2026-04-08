@@ -6,7 +6,8 @@ const path = require("path");
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: (req, file) => {
-        const ext = path.extname(file.originalname).toLowerCase(); // .pdf
+        const path = require("path");
+        const ext = path.extname(file.originalname).toLowerCase();
         const name = path.parse(file.originalname).name;
 
         let resourceType = "image";
@@ -19,7 +20,8 @@ const storage = new CloudinaryStorage({
             folder: "secure-file-vault",
             resource_type: resourceType,
             public_id: Date.now() + "-" + name,
-            format: ext.replace(".", ""), // ✅ VERY IMPORTANT
+            format: ext.replace(".", ""),
+            access_mode: "public", // ✅ ADD THIS
         };
     },
 });
