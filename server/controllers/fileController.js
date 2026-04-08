@@ -171,7 +171,7 @@ exports.restoreFile = async (req, res) => {
     }
 };
 
-export const getFile = async (req, res) => {
+exports.getFile = async (req, res) => {
     try {
         const file = await File.findById(req.params.id);
 
