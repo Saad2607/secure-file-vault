@@ -61,25 +61,13 @@ function Dashboard() {
     };
 
     // Download
-    const handleDownload = async (id, filename) => {
-        try {
-            const res = await API.get(`/files/download/${id}`, {
-                responseType: "blob", // VERY IMPORTANT
-            });
-
-            // Create download link
-            const url = window.URL.createObjectURL(new Blob([res.data]));
-            const link = document.createElement("a");
-
-            link.href = url;
-            link.setAttribute("download", filename); // correct file name
-            document.body.appendChild(link);
-            link.click();
-
-            link.remove();
-        } catch (error) {
-            console.error("Download error", error);
-        }
+    const handleDownload = (fileUrl, filename) => {
+        const link = document.createElement("a");
+        link.href = fileUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
     };
 
     const toggleFavorite = async (id) => {
@@ -234,7 +222,7 @@ function Dashboard() {
                                                 {/* 🖼 IMAGE */}
                                                 {isImage(f.originalname) && (
                                                     <img
-                                                        src={`https://secure-file-vault-yo6j.onrender.com/api/files/file/${f._id}`}
+                                                        src={f.fileUrl}
                                                         alt="preview"
                                                         className="w-full h-full object-cover"
                                                         onError={(e) => {
@@ -290,7 +278,7 @@ function Dashboard() {
 
                                                 {/* ⬇ Download */}
                                                 <button
-                                                    onClick={() => handleDownload(f._id, f.originalname)}
+                                                    onClick={() => handleDownload(f.fileUrl, f.originalname)}
                                                     className="bg-blue-500 px-3 py-1 rounded text-sm hover:bg-blue-600"
                                                 >
                                                     Download
@@ -361,7 +349,7 @@ function Dashboard() {
                         {/* 🖼 IMAGE */}
                         {isImage(selectedFile.originalname) && (
                             <img
-                                src={`https://secure-file-vault-yo6j.onrender.com/api/files/file/${selectedFile._id}`}
+                                src={selectedFile.fileUrl}
                                 className="max-h-full max-w-full object-contain rounded-lg"
                                 alt="preview"
                             />
@@ -370,7 +358,7 @@ function Dashboard() {
                         {/* 📄 PDF */}
                         {isPDF(selectedFile.originalname) && (
                             <iframe
-                                src={`https://secure-file-vault-yo6j.onrender.com/api/files/file/${selectedFile._id}`}
+                                src={selectedFile.fileUrl}
                                 className="w-full h-full rounded-lg"
                                 title="pdf-preview"
                             />

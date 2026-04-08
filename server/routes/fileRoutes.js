@@ -1,7 +1,7 @@
 const express = require("express");
 const upload = require("../middleware/uploadMiddleware");
 const authMiddleware = require("../middleware/authMiddleware");
-const { uploadFile, downloadFile, getFiles, deleteFiles, toggleFavorite, restoreFile, deletePermanent, getFile } = require("../controllers/fileController");
+const { uploadFile, downloadFile, getFiles, deleteFiles, toggleFavorite, restoreFile, deletePermanent } = require("../controllers/fileController");
 
 const router = express.Router();
 
@@ -18,7 +18,5 @@ router.put("/favorite/:id", authMiddleware, toggleFavorite);
 router.put("/restore/:id", authMiddleware, restoreFile);
 
 router.delete("/permanent/:id", authMiddleware, deletePermanent);
-
-router.get("/file/:id", getFile);
 
 module.exports = router;

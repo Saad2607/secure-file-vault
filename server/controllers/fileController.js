@@ -5,23 +5,17 @@ const path = require("path");
 
 exports.uploadFile = async (req, res) => {
     try {
-        console.log("REQ FILE: ", req.file);
         const file = req.file;
 
         if (!file) {
             return res.status(400).json({ message: "No file uploaded" });
         }
 
-        console.log("FILE PATH: ", file.path);
-
-
-        file.path = `uploads/${file.filename}`;
-
         const newFile = new File({
             filename: file.filename,
             originalname: file.originalname,
-            fileUrl: file.filename,
-            path: file.path,
+            fileUrl: file.path, // ✅ Cloudinary URL
+            public_id: file.filename, // optional
             user: req.user.id,
         });
 
@@ -29,45 +23,45 @@ exports.uploadFile = async (req, res) => {
 
         res.status(201).json(newFile);
     } catch (error) {
-        console.log("UPLOAD ERROR: ", error);
+        console.log(error);
         res.status(500).json({ error: error.message });
     }
 };
 
-exports.downloadFile = async (req, res) => {
-    try {
-        const file = await File.findById(req.params.id);
+// exports.downloadFile = async (req, res) => {
+//     try {
+//         const file = await File.findById(req.params.id);
 
-        if (!file) {
-            return res.status(404).json({ message: "File not found" });
-        }
+//         if (!file) {
+//             return res.status(404).json({ message: "File not found" });
+//         }
 
-        // Read encrypted data
-        const encryptedData = fs.readFileSync(file.path, "utf-8");
+//         // Read encrypted data
+//         const encryptedData = fs.readFileSync(file.path, "utf-8");
 
-        // Decrypt
-        const bytes = CryptoJS.AES.decrypt(
-            encryptedData,
-            process.env.JWT_SECRET
-        );
+//         // Decrypt
+//         const bytes = CryptoJS.AES.decrypt(
+//             encryptedData,
+//             process.env.JWT_SECRET
+//         );
 
-        const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
+//         const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
 
-        // Convert back to buffer
-        const fileBuffer = Buffer.from(decryptedData, "base64");
+//         // Convert back to buffer
+//         const fileBuffer = Buffer.from(decryptedData, "base64");
 
-        // Send file
-        res.setHeader("Content-Type", "application/octet-stream");
-        res.setHeader(
-            "Content-Disposition",
-            `attachment; filename="${file.filename}"`
-        );
+//         // Send file
+//         res.setHeader("Content-Type", "application/octet-stream");
+//         res.setHeader(
+//             "Content-Disposition",
+//             `attachment; filename="${file.filename}"`
+//         );
 
-        res.end(fileBuffer);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
+//         res.end(fileBuffer);
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// };
 
 exports.getFiles = async (req, res) => {
     try {
@@ -165,31 +159,5 @@ exports.restoreFile = async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ message: "Restore error" });
-    }
-};
-
-exports.getFile = async (req, res) => {
-    try {
-        const file = await File.findById(req.params.id);
-
-        if (!file) {
-            return res.status(404).json({ message: "File not found" });
-        }
-
-        console.log("DB FILE:", file); // 🔍
-        
-        const filePath = path.join(process.cwd(), file.path);
-
-        console.log("FINAL PATH:", filePath); // 🔍
-
-        if (!fs.existsSync(filePath)) {
-            console.log("FILE NOT FOUND ON SERVER ❌");
-            return res.status(404).json({ message: "File not found on server" });
-        }
-
-        res.sendFile(filePath);
-    } catch (err) {
-        console.log("GET FILE ERROR:", err); // 🔥
-        res.status(500).json({ message: "Error retrieving file" });
     }
 };
