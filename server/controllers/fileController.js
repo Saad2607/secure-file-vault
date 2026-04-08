@@ -7,7 +7,7 @@ exports.uploadFile = async (req, res) => {
     try {
         const file = req.file;
 
-        // ✅ Read file
+        // // ✅ Read file
         // const fileData = fs.readFileSync(file.path);
 
         // // ✅ Encrypt
@@ -19,7 +19,7 @@ exports.uploadFile = async (req, res) => {
         // // ✅ Save encrypted data
         // fs.writeFileSync(file.path, encryptedData);
 
-        file.path = `uploads/${file.filename}`;
+        // file.path = `uploads/${file.filename}`;
 
         const newFile = new File({
             filename: file.filename,
@@ -175,21 +175,36 @@ exports.getFile = async (req, res) => {
     try {
         const file = await File.findById(req.params.id);
 
-        if (!file) {
-            return res.status(404).json({ message: "File not found" });
+        if (!file) return res.status(404).json({ message: "File not found" });
+
+        const encryptedData = fs.readFileSync(file.path, "utf8");
+
+        // ✅ Decrypt
+        const bytes = CryptoJS.AES.decrypt(
+            encryptedData,
+            process.env.JWT_SECRET
+        );
+
+        const decryptedData = Buffer.from(
+            bytes.toString(CryptoJS.enc.Utf8),
+            "base64"
+        );
+
+        const ext = path.extname(file.originalname).toLowerCase();
+
+        if (ext === ".png") {
+            res.setHeader("Content-Type", "image/png");
+        } else if (ext === ".jpg" || ext === ".jpeg") {
+            res.setHeader("Content-Type", "image/jpeg");
+        } else if (ext === ".pdf") {
+            res.setHeader("Content-Type", "application/pdf");
         }
+        
+        // ✅ Send correct type
+        res.setHeader("Content-Disposition", `inline; filename="${file.originalname}"`);
+        res.send(decryptedData);
 
-        const filePath = path.join(process.cwd(), file.path);
-
-        console.log("FILE PATH:", filePath); // 🔍 debug
-
-        if (!fs.existsSync(filePath)) {
-            return res.status(404).json({ message: "File not found on server" });
-        }
-
-        res.sendFile(filePath);
-    } catch (err) {
-        console.log(err);
+    } catch (error) {
         res.status(500).json({ message: "Error retrieving file" });
     }
 };
