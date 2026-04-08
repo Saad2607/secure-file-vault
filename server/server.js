@@ -6,6 +6,7 @@ const authRoutes = require("./routes/authRoutes");
 const protectedRoutes = require("./routes/protectedRoutes");
 const fileRoutes = require("./routes/fileRoutes");
 const path = require("path");
+const fs = require("fs");
 
 dotenv.config();
 
@@ -20,6 +21,10 @@ app.use("/api/protected", protectedRoutes);
 app.use("/api/files", fileRoutes);
 
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
+if(!fs.existsSync("uploads")) {
+    fs.mkdirSync("uploads");
+}
 
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log("MongoDB Connected"))

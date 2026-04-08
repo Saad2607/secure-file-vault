@@ -43,12 +43,19 @@ function Dashboard() {
             const formData = new FormData();
             formData.append("file", file);
 
-            await API.post("/files/upload", formData);
+            const token = localStorage.getItem("token"); // ✅ get token
 
-            fetchFiles(); // refresh UI
+            await API.post("/files/upload", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${token}`, // ✅ VERY IMPORTANT
+                },
+            });
+
+            fetchFiles();
             toast.success("File Uploaded!");
         } catch (error) {
-            console.error("Upload error:", error);
+            console.error("Upload error:", error.response?.data || error);
             toast.error("Upload Failed!");
         }
     };
@@ -150,7 +157,7 @@ function Dashboard() {
             <div className="flex">
                 <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
                 <div className="p-6 flex-1">
-                    
+
                     <div className="flex justify-between items-center mb-6">
                         <h1 className="text-2xl font-bold">Dashboard</h1>
 

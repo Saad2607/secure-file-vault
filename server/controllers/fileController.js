@@ -5,21 +5,17 @@ const path = require("path");
 
 exports.uploadFile = async (req, res) => {
     try {
+        console.log("REQ FILE: ", req.file);
         const file = req.file;
 
-        // // ✅ Read file
-        // const fileData = fs.readFileSync(file.path);
+        if (!file) {
+            return res.status(400).json({ message: "No file uploaded" });
+        }
 
-        // // ✅ Encrypt
-        // const encryptedData = CryptoJS.AES.encrypt(
-        //     fileData.toString("base64"),
-        //     process.env.JWT_SECRET
-        // ).toString();
+        console.log("FILE PATH: ", file.path);
 
-        // // ✅ Save encrypted data
-        // fs.writeFileSync(file.path, encryptedData);
 
-        // file.path = `uploads/${file.filename}`;
+        file.path = `uploads/${file.filename}`;
 
         const newFile = new File({
             filename: file.filename,
@@ -33,6 +29,7 @@ exports.uploadFile = async (req, res) => {
 
         res.status(201).json(newFile);
     } catch (error) {
+        console.log("UPLOAD ERROR: ", error);
         res.status(500).json({ error: error.message });
     }
 };
@@ -199,7 +196,7 @@ exports.getFile = async (req, res) => {
         } else if (ext === ".pdf") {
             res.setHeader("Content-Type", "application/pdf");
         }
-        
+
         // ✅ Send correct type
         res.setHeader("Content-Disposition", `inline; filename="${file.originalname}"`);
         res.send(decryptedData);
