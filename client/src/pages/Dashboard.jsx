@@ -397,7 +397,7 @@ function Dashboard() {
                         {/* 📄 PDF */}
                         {isPDF(selectedFile.originalname) && (
                             <iframe
-                                src={`https://docs.google.com/gview?url=${selectedFile.fileUrl}&embedded=true`}
+                                src={selectedFile.fileUrl}
                                 className="w-full h-full rounded-lg"
                                 title="pdf-preview"
                             />
