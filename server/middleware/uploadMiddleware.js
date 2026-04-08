@@ -19,9 +19,9 @@ const storage = new CloudinaryStorage({
         return {
             folder: "secure-file-vault",
             resource_type: resourceType,
+            type: "upload", // ✅ VERY IMPORTANT FIX
             public_id: Date.now() + "-" + name,
             format: ext.replace(".", ""),
-            access_mode: "public", // ✅ ADD THIS
         };
     },
 });
