@@ -61,7 +61,7 @@ function Login() {
                     {loading ? (
                         <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-5 h-5"></span>
                     ) : (
-                        Login
+                        "Login"
                     )}
                 </button>
 
