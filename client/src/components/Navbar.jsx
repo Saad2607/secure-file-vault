@@ -16,9 +16,6 @@ function Navbar() {
 
     const logout = () => {
         localStorage.removeItem("token");
-
-        toast.success("Login Successful ✅");
-
         navigate("/");
     };
 
