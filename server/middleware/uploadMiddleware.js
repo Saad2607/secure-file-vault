@@ -12,7 +12,7 @@ const storage = new CloudinaryStorage({
 
         return {
             folder: "secure-file-vault",
-            resource_type: "image", // 🔥 FORCE IMAGE
+            resource_type: "auto", // 🔥 FORCE IMAGE
             public_id: Date.now() + "-" + name,
             format: ext, // keeps pdf extension
         };
