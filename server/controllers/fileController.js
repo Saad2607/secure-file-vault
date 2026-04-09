@@ -63,6 +63,11 @@ exports.uploadFile = async (req, res) => {
 //     }
 // };
 
+exports.getSingleFile = async (req, res) => {
+    const file = await File.findById(req.params.id);
+    res.json(file);
+};
+
 exports.getFiles = async (req, res) => {
     try {
         const files = await File.find({ user: req.user.id });

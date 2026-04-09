@@ -62,13 +62,24 @@ function Dashboard() {
     };
 
     // Download
-    const handleDownload = (fileUrl, filename) => {
-        const link = document.createElement("a");
-        link.href = fileUrl;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
+    const handleDownload = async (fileUrl, filename) => {
+        try {
+            const response = await fetch(fileUrl);
+            const blob = await response.blob();
+
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+
+            link.href = url;
+            link.download = filename || "file";
+            document.body.appendChild(link);
+            link.click();
+
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Download error:", error);
+        }
     };
 
     const toggleFavorite = async (id) => {
@@ -307,10 +318,7 @@ function Dashboard() {
 
                                                         {/* ⬇ Download */}
                                                         <button
-                                                            onClick={() => {
-                                                                handleDownload(f.fileUrl, f.originalname);
-                                                                setOpenMenuId(null);
-                                                            }}
+                                                            onClick={() => handleDownload(f.fileUrl, f.originalname)}
                                                             className="block w-full text-left px-4 py-2 hover:bg-gray-700"
                                                         >
                                                             ⬇ Download
