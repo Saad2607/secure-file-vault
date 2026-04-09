@@ -1,6 +1,7 @@
 import { useState } from "react";
 import API from "../services/api";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -11,25 +12,19 @@ function Login() {
     const handleLogin = async () => {
         try {
             setLoading(true);
-            console.log("Login clicked");
 
             const res = await API.post("/auth/login", {
                 email,
                 password,
             });
 
-            console.log("API success");
-
             localStorage.setItem("token", res.data.token);
 
-            console.log("Before navigate");
+            toast.success("Login Successful ✅");
 
             navigate("/dashboard");
 
-            console.log("After navigate");
-
         } catch (error) {
-            console.log("Error:", error);
             toast.error("Login Failed ❌");
         } finally {
             setLoading(false);
