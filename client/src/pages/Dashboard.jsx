@@ -141,8 +141,12 @@ function Dashboard() {
 
     useEffect(() => {
         const handleClickOutside = () => setOpenMenuId(null);
-        window.addEventListener("click", handleClickOutside);
-        return () => window.removeEventListener("click", handleClickOutside);
+
+        document.addEventListener("click", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
     }, []);
 
     return (
@@ -272,9 +276,10 @@ function Dashboard() {
 
                                                 {/* 3 DOT BUTTON */}
                                                 <button
-                                                    onClick={() =>
-                                                        setOpenMenuId(openMenuId === f._id ? null : f._id)
-                                                    }
+                                                    onClick={(e) => {
+                                                        e.stopPropagation(); // 🔥 IMPORTANT
+                                                        setOpenMenuId(openMenuId === f._id ? null : f._id);
+                                                    }}
                                                     className="text-white text-xl"
                                                 >
                                                     ⋮
@@ -282,7 +287,10 @@ function Dashboard() {
 
                                                 {/* DROPDOWN MENU */}
                                                 {openMenuId === f._id && (
-                                                    <div className="absolute right-0 top-8 bg-gray-800 rounded-lg shadow-lg w-40 z-50">
+                                                    <div
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        className="absolute right-0 top-8 bg-gray-800 rounded-lg shadow-lg w-40 z-50"
+                                                    >
 
                                                         {/* ⭐ Favorite */}
                                                         {activeTab !== "trash" && (
