@@ -11,19 +11,25 @@ function Login() {
     const handleLogin = async () => {
         try {
             setLoading(true);
+            console.log("Login clicked");
 
             const res = await API.post("/auth/login", {
                 email,
                 password,
             });
 
+            console.log("API success");
+
             localStorage.setItem("token", res.data.token);
 
-            toast.success("Login Successful ✅");
+            console.log("Before navigate");
 
             navigate("/dashboard");
 
+            console.log("After navigate");
+
         } catch (error) {
+            console.log("Error:", error);
             toast.error("Login Failed ❌");
         } finally {
             setLoading(false);
