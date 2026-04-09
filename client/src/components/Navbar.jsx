@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import toast from "react-hot-toast";
 
 function Navbar() {
     const navigate = useNavigate();
@@ -15,6 +16,9 @@ function Navbar() {
 
     const logout = () => {
         localStorage.removeItem("token");
+
+        toast.success("Login Successful ✅");
+
         navigate("/");
     };
 
