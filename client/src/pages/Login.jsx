@@ -5,16 +5,31 @@ import { useNavigate } from "react-router-dom";
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleLogin = async () => {
-        const res = await API.post("/auth/login", {
-            email,
-            password,
-        });
+        try {
+            setLoading(true);
 
-        localStorage.setItem("token", res.data.token);
-        window.location.href = "/dashboard";
+            const res = await API.post("/auth/login", {
+                email,
+                password,
+            });
+
+            localStorage.setItem("token", res.data.token);
+
+            toast.success("Login Successful ✅");
+
+            setTimeout(() => {
+                navigate("/dashboard");
+            }, 1000);
+
+        } catch (error) {
+            toast.error("Login Failed ❌");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -40,9 +55,14 @@ function Login() {
 
                 <button
                     onClick={handleLogin}
-                    className="w-full bg-blue-600 py-2 rounded hover:bg-blue-700"
+                    disabled={loading}
+                    className="w-full bg-blue-500 text-white py-2 rounded flex items-center justify-center"
                 >
-                    Login
+                    {loading ? (
+                        <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-5 h-5"></span>
+                    ) : (
+                        Login
+                    )}
                 </button>
 
                 <p className="mt-5">
