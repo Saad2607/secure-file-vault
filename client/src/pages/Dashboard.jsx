@@ -11,6 +11,9 @@ function Dashboard() {
     const [selectedFile, setSelectedFile] = useState(null);
     const [search, setSearch] = useState("");
     const [openMenuId, setOpenMenuId] = useState(null);
+    const [usedStorage, setUsedStorage] = useState(0);
+    const [totalStorage, setTotalStorage] = useState(0);
+    const percent = totalStorage ? (usedStorage / totalStorage) * 100 : 0;
 
     const filteredFiles = files.filter((file) => {
         const matchesSearch = file.originalname
@@ -30,8 +33,10 @@ function Dashboard() {
     // Fetch files
     const fetchFiles = async () => {
         const res = await API.get("/files");
-        setFiles(res.data);
-        console.log(files);
+
+        setFiles(res.data.files);
+        setUsedStorage(res.data.usedStorage);
+        setTotalStorage(res.data.totalStorage);
     };
 
     useEffect(() => {
@@ -135,14 +140,20 @@ function Dashboard() {
     const totalFiles = files.filter(f => !f.isDeleted).length;
     const totalFavorites = files.filter(f => f.isFavorite && !f.isDeleted).length;
 
-    const totalSize = files.reduce((acc, f) => {
-        if (!f.isDeleted) return acc + (f.size || 0);
-        return acc;
-    }, 0);
+    const getColor = () => {
+        if(percent > 80) return "bg-red-500";
+        if(percent > 50) return "bg-yellow-500";
+        return "bg-blue-500";
+    }
 
-    const formatSize = (bytes) => {
-        return (bytes / (1024 * 1024)).toFixed(2) + " MB";
-    };
+    // const totalSize = files.reduce((acc, f) => {
+    //     if (!f.isDeleted) return acc + (f.size || 0);
+    //     return acc;
+    // }, 0);
+
+    // const formatSize = (bytes) => {
+    //     return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+    // };
 
     useEffect(() => {
         if (file) {
@@ -194,7 +205,17 @@ function Dashboard() {
 
                         <div className="bg-gray-900 p-4 rounded-xl">
                             <p className="text-gray-400">Storage Used</p>
-                            <h2 className="text-2xl font-bold">{formatSize(totalSize)}</h2>
+                            <div className="w-full bg-gray-700 rounded-full h-3 mt-2">
+                                <div
+                                    className={`${getColor()} h-3 rounded-full`}
+                                    style={{ width: `${percent}%` }}
+                                ></div>
+                            </div>
+
+                            <p className="text-sm text-gray-300 mt-1">
+                                {(usedStorage / (1024 * 1024)).toFixed(2)} MB /{" "}
+                                {(totalStorage / (1024 * 1024)).toFixed(0)} MB used
+                            </p>
                         </div>
 
                     </div>

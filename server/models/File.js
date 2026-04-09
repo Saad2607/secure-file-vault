@@ -13,6 +13,11 @@ const fileSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    public_id: String,
+    size: {
+        type: Number,
+        default: 0
+    },
     isDeleted: {
         type: Boolean,
         default: false

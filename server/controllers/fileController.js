@@ -11,11 +11,42 @@ exports.uploadFile = async (req, res) => {
             return res.status(400).json({ message: "No file uploaded" });
         }
 
+        const fileSize = req.file.size;
+
+        // calculate used storage
+        const totalUsed = await File.aggregate([
+            {
+                $match: {
+                    user: req.user.id,
+                    isDeleted: false,
+                },
+            },
+            {
+                $group: {
+                    _id: null,
+                    total: { $sum: "$size" },
+                },
+            },
+        ]);
+
+        const usedStorage = totalUsed[0]?.total || 0;
+
+        // limit (100MB)
+        const MAX_STORAGE = 100 * 1024 * 1024;
+
+        // 🚨 CHECK LIMIT
+        if (usedStorage + fileSize > MAX_STORAGE) {
+            return res.status(400).json({
+                message: "Storage limit exceeded",
+            });
+        }
+
         const newFile = new File({
             filename: file.filename,
             originalname: file.originalname,
-            fileUrl: file.path, // ✅ Cloudinary URL
-            public_id: file.filename, // optional
+            fileUrl: file.path,
+            public_id: file.filename,
+            size: file.size,
             user: req.user.id,
         });
 
@@ -71,7 +102,17 @@ exports.getSingleFile = async (req, res) => {
 exports.getFiles = async (req, res) => {
     try {
         const files = await File.find({ user: req.user.id });
-        res.json(files);
+
+        const totalUsed = files.reduce((acc, f) => {
+            if (!f.isDeleted) return acc + (f.size || 0);
+            return acc;
+        }, 0);
+
+        res.json({
+            files,
+            usedStorage: totalUsed,
+            totalStorage: 100 * 1024 * 1024,
+        });
     } catch (error) {
         res.status(500).json({ message: "Error fetching files" });
     }

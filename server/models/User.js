@@ -16,6 +16,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+
+    storageLimit: {
+        type: Number,
+        default: 100 * 1024 * 1024,
+    },
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", userSchema);
