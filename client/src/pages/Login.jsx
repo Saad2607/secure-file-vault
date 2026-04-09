@@ -21,9 +21,7 @@ function Login() {
 
             toast.success("Login Successful ✅");
 
-            setTimeout(() => {
-                navigate("/dashboard");
-            }, 1000);
+            navigate("/dashboard");
 
         } catch (error) {
             toast.error("Login Failed ❌");
