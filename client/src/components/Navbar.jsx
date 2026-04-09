@@ -1,10 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import { useState } from "react";
 
 function Navbar() {
     const navigate = useNavigate();
-    const [loggingOut, setLoggingOut] = useState(false);
 
     let userName = "User";
 
@@ -15,13 +13,9 @@ function Navbar() {
         userName = decoded.name || decoded.email;
     }
 
-    const handleLogout = () => {
-        setLoggingOut(true);
-
-        setTimeout(() => {
-            localStorage.removeItem("token");
-            navigate("/login");
-        }, 1500); // animation time
+    const logout = () => {
+        localStorage.removeItem("token");
+        navigate("/");
     };
 
     return (
@@ -36,17 +30,12 @@ function Navbar() {
                     Welcome, {userName} 👋
                 </span>
 
-                {loggingOut ? (
-                    <div className="flex items-center justify-center h-screen">
-                        <p className="text-lg font-semibold animate-pulse">
-                            Logging out...
-                        </p>
-                    </div>
-                ) : (
-                    <button onClick={handleLogout}>
-                        Logout
-                    </button>
-                )}
+                <button
+                    onClick={logout}
+                    className="bg-red-500 px-4 py-1 rounded hover:bg-red-600"
+                >
+                    Logout
+                </button>
             </div>
         </div>
     );
