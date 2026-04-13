@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import API from "../services/api";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
     const [file, setFile] = useState(null);
@@ -14,6 +15,7 @@ function Dashboard() {
     const [usedStorage, setUsedStorage] = useState(0);
     const [totalStorage, setTotalStorage] = useState(0);
     const percent = totalStorage ? (usedStorage / totalStorage) * 100 : 0;
+    const navigate = useNavigate();
 
     const filteredFiles = files.filter((file) => {
         const matchesSearch = file.originalname
@@ -28,7 +30,6 @@ function Dashboard() {
     const isImage = (name) => /\.(jpg|jpeg|png|gif)$/i.test(name);
     const isPDF = (name) => /\.pdf$/i.test(name);
     const isDoc = (name) => /\.(doc|docx)$/i.test(name);
-
 
     // Fetch files
     const fetchFiles = async () => {
@@ -141,19 +142,16 @@ function Dashboard() {
     const totalFavorites = files.filter(f => f.isFavorite && !f.isDeleted).length;
 
     const getColor = () => {
-        if(percent > 80) return "bg-red-500";
-        if(percent > 50) return "bg-yellow-500";
+        if (percent > 80) return "bg-red-500";
+        if (percent > 50) return "bg-yellow-500";
         return "bg-blue-500";
     }
 
-    // const totalSize = files.reduce((acc, f) => {
-    //     if (!f.isDeleted) return acc + (f.size || 0);
-    //     return acc;
-    // }, 0);
+    const handleLogout = () => {
+        localStorage.removeItem("token");
 
-    // const formatSize = (bytes) => {
-    //     return (bytes / (1024 * 1024)).toFixed(2) + " MB";
-    // };
+        navigate("/");
+    };
 
     useEffect(() => {
         if (file) {
@@ -173,14 +171,20 @@ function Dashboard() {
 
     return (
         <div className="min-h-screen bg-gray-950 text-white">
-            <Toaster />
             <Navbar />
             <div className="flex">
-                <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-                <div className="p-6 flex-1">
+                <Sidebar
+                    activeTab={activeTab}
+                    setActiveTab={setActiveTab}
+                    handleLogout={handleLogout}
+                    totalFiles={totalFiles}
+                    totalFavorites={totalFavorites}
+                    usedStorage={usedStorage}
+                    percent={percent}
+                />
+                <div className="ml-64 mt-16 h-[calc(100vh-4rem)] overflow-y-auto w-full p-6">
 
                     <div className="flex justify-between items-center mb-6">
-                        <h1 className="text-2xl font-bold">Dashboard</h1>
 
                         <input
                             type="text"
@@ -191,43 +195,16 @@ function Dashboard() {
                         />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-
-                        <div className="bg-gray-900 p-4 rounded-xl">
-                            <p className="text-gray-400">Total Files</p>
-                            <h2 className="text-2xl font-bold">{totalFiles}</h2>
-                        </div>
-
-                        <div className="bg-gray-900 p-4 rounded-xl">
-                            <p className="text-gray-400">Favorites</p>
-                            <h2 className="text-2xl font-bold">{totalFavorites}</h2>
-                        </div>
-
-                        <div className="bg-gray-900 p-4 rounded-xl">
-                            <p className="text-gray-400">Storage Used</p>
-                            <div className="w-full bg-gray-700 rounded-full h-3 mt-2">
-                                <div
-                                    className={`${getColor()} h-3 rounded-full`}
-                                    style={{ width: `${percent}%` }}
-                                ></div>
-                            </div>
-
-                            <p className="text-sm text-gray-300 mt-1">
-                                {(usedStorage / (1024 * 1024)).toFixed(2)} MB /{" "}
-                                {(totalStorage / (1024 * 1024)).toFixed(0)} MB used
-                            </p>
-                        </div>
-
-                    </div>
+                    
 
                     {/* Upload */}
                     {(activeTab !== "trash" && activeTab !== "favorites") && (
                         <div className="mb-6">
                             <button
                                 onClick={() => document.getElementById("fileInput").click()}
-                                className="fixed bottom-6 right-6 bg-blue-600 p-4 rounded-full shadow-lg hover:bg-blue-700"
+                                className="fixed bottom-6 right-6 bg-blue-600 p-4 rounded-2xl shadow-lg hover:bg-blue-700"
                             >
-                                ➕
+                                ➕ New
                             </button>
 
                             <input
@@ -267,7 +244,7 @@ function Dashboard() {
                                                     <img
                                                         src={f.fileUrl}
                                                         alt="preview"
-                                                        className="w-full h-full object-cover"
+                                                        className="w-full h-full object-contain"
                                                         onError={(e) => {
                                                             console.log("Image failed:", f);
                                                             // e.target.src = "https://via.placeholder.com/150";
