@@ -59,7 +59,7 @@ const Profile = () => {
 
                 <div className="flex flex-col items-center mb-4">
                     <img
-                        src={user?.avatar || "https://i.pravatar.cc/150"}
+                        src={user?.avatar || ""}
                         className="w-24 h-24 rounded-full border-4 border-blue-500"
                     />
                     <input type="file" onChange={handleAvatar} className="mt-3 text-white" />
