@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-    baseURL: "https://secure-file-vault-yo6j.onrender.com",
+    baseURL: "https://secure-file-vault-xi5u.onrender.com",
 });
 
 // Add token automatically in every request
